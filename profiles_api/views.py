@@ -1,6 +1,10 @@
+from email import message_from_string
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import viewsets
+
 
 from . import serializers
 
@@ -44,4 +48,50 @@ class HelloApiView(APIView):
     def delete(self, request , pk =None):  #pk stands for primary
         '''delete am object'''
         return Response({"method":'Delete'})
-        
+
+
+class HelloViewSet(viewsets.ViewSet):
+    '''Test API Viewset'''
+    serializer_class= serializers.HelloSerializer
+
+    def list(self, request):
+        '''return a hello message'''
+        a_viewset = [
+            'Users actions (list, create, retrieve, update, partical_update',
+            "automatically maps to URL using Routers",
+            'Proviedes more functionality with less code',
+        ]
+
+        return  Response ({"message":'Hello',"a_viewset":a_viewset})
+
+    def create(self, request):
+        """create a new hello message"""
+        serializer = self.serializer_class(data= request.data)
+
+        if serializer.is_valid():
+            name =serializer.validated_data.get('name')
+            message = f'Hello {name}!'
+            return Response({'Message':message})
+        else:
+            return Response(
+                serializer.errors,
+                status= status.HTTP_400_BAD_REQUEST
+            )
+
+
+    def retrieve(self,request, pk =None):
+        """handle gettingb an object by  its ID"""
+        return Response({'http_method':'GET'})
+
+    def update(self,request, pk=None):
+        """Handle updatting an object"""
+        return Response({'Http_method':"put"})
+
+    def partical_update(self,request, pk = None):
+        '''Handle updatting party of an object'''
+        return Response({'http_method':'patch'})
+
+    def destroy(self,request, pk=None):
+        '''handle removing an object'''
+        return Response ({'ghttp_method':'delete'})
+    
